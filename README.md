@@ -2,7 +2,7 @@
 
 Configuration in this directory creates an AWS EKS cluster with [Karpenter](https://karpenter.sh/) provisioned for managing compute resource scaling. In the example provided, Karpenter is provisioned on top of an EKS Managed Node Group.
 
-Note: This configuration allows you to deploy the cluster with all the basic functionalities, with karpenter handling autoscaling, node provisioning etcetera. More granular configurations such as network segregation, rbac, etc will require more configurations
+Note: This configuration allows you to deploy the cluster with all the basic functionalities, with karpenter handling autoscaling, node provisioning etcetera. More granular configurations such as network segregation, rbac, etc will require more configurations.
 
 ## Usage
 
