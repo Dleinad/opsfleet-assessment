@@ -7,11 +7,11 @@ on:
         description: Environment to deploy
         required: true
         default: dev
-    infra-action:
-      type: boolean
-      description: Run infrastructure deployment actions
-      required: true
-      default: false
+      infra-action:
+        type: boolean
+        description: Run infrastructure deployment actions
+        required: true
+        default: false
 
 jobs:
   terraform-plan:
