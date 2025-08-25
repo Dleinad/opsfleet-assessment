@@ -22,18 +22,6 @@ variable "tags" {
   default     = {}
 }
 
-# variable "TF_BACKEND_BUCKET" {
-#   description = "The S3 bucket to use for Terraform state storage"
-#   type        = string
-#   default     = ""
-# }
-
-# variable "TF_BACKEND_KEY" {
-#   description = "The path within the S3 bucket to store the Terraform state file"
-#   type        = string
-#   default     = ""
-# }
-
 ################################################################################
 # Cluster
 ################################################################################
