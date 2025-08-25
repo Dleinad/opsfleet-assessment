@@ -354,6 +354,12 @@ data "aws_iam_policy_document" "controller" {
     actions   = ["eks:DescribeCluster"]
   }
 
+  statement {
+    sid       = "AllowServiceLinkedRoleCreation"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
+  }
+
   dynamic "statement" {
     for_each = var.iam_policy_statements != null ? var.iam_policy_statements : []
 
