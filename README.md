@@ -1,4 +1,4 @@
-# Karpenter Example
+# Opsfleet EKS
 
 Configuration in this directory creates an AWS EKS cluster with [Karpenter](https://karpenter.sh/) provisioned for managing compute resource scaling. In the example provided, Karpenter is provisioned on top of an EKS Managed Node Group.
 
@@ -12,6 +12,16 @@ $ terraform plan
 $ terraform apply --auto-approve
 ```
 
+However, the above commands have been automated using a Github Actions Pipeline. Follow the steps below to run the pipeline
+
+```bash
+- create and environment on github actions called `dev`
+- on the environment, create secrets for your required credentials, in this case the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+- create variables for your other parameters such as the backend configuration
+- once done, head to actions, the pipeline is created for a workflow_dispatch meaning you have to manually trigger this, it is designed to allow you choose the environment to deploy to, which in turn chooses the appropriate .tfvars containing your environment's values
+- run pipeline.
+```
+
 Once the cluster is up and running, you can check that Karpenter is functioning as intended with the following command:
 
 ```bash
@@ -23,12 +33,13 @@ kubectl apply -f karpenter.yaml
 
 # Second, deploy the example deployment
 kubectl apply -f inflate.yaml
+kubectl apply -f postgres.yaml
 
 # You can watch Karpenter's controller logs with
 kubectl logs -f -n kube-system -l app.kubernetes.io/name=karpenter -c controller
 ```
 
-Validate if the Amazon EKS Addons Pods are running in the Managed Node Group and the `inflate` application Pods are running on Karpenter provisioned Nodes.
+Validate if the Amazon EKS Addons Pods are running in the Managed Node Group and the `inflate` and `postgres` application Pods are running on Karpenter provisioned Nodes.
 
 ```bash
 kubectl get nodes -L karpenter.sh/registered
@@ -78,12 +89,14 @@ Because Karpenter manages the state of node resources outside of Terraform, Karp
 
 ```bash
 kubectl delete deployment inflate
+kubectl delete deployment postgres
 ```
 
 2. Remove the resources created by Terraform
 
 ```bash
-terraform destroy --auto-approve
+- another pipeline "Infra - Terraform Destroy" has been created for Infra Destroy purposes
+- on actions, click on the pipeline, choose the environmet and select "true" for the infra-actions input. This would destroy the cluster
 ```
 
 Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
