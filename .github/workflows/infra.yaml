@@ -88,4 +88,4 @@ jobs:
       - name: Terraform Apply
         run: >
           terraform apply -auto-approve
-          environments/${{ github.event.inputs.environment }}/tfplan-${{ github.event.inputs.environment }}
+          -var-file="environments/${{ github.event.inputs.environment }}.tfvars"
