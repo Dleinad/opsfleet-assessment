@@ -1,3 +1,5 @@
 name = "01-opsfleet-dev"
 region = "eu-west-1"
 vpc_cidr = "10.0.0.0/16"
+# TF_BACKEND_BUCKET = "opsfleet-infra-bucket"
+# TF_BACKEND_KEY = "opsfleet-infra-bucket/dev.tfstate"
