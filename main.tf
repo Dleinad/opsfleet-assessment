@@ -58,7 +58,7 @@ module "eks" {
 ################################################################################
 
 module "karpenter" {
-  source = "modules/karpenter" 
+  source = "./modules/karpenter" 
 
   cluster_name = module.eks.cluster_name
 
@@ -76,7 +76,7 @@ module "karpenter" {
 }
 
 module "karpenter_disabled" {
-  source = "modules/karpenter"
+  source = "./modules/karpenter"
 
   create = false
 }
