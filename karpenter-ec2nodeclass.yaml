@@ -5,12 +5,12 @@ metadata:
 spec:
   amiSelectorTerms:
     - alias: bottlerocket@latest
-  role: 02-opsfleet-dev
+  role: 01-opsfleet-dev
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: 02-opsfleet-dev
+        karpenter.sh/discovery: 01-opsfleet-dev
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: 02-opsfleet-dev
+        karpenter.sh/discovery: 01-opsfleet-dev
   tags:
-    karpenter.sh/discovery: 02-opsfleet-dev
+    karpenter.sh/discovery: 01-opsfleet-dev

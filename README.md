@@ -98,7 +98,9 @@ kubectl delete deployment inflate
 kubectl delete deployment postgres
 ```
 
-2. Remove the resources created by Terraform
+2. DELETE NODES AND NODEGROUPS CREATED BY KARPENTER
+
+3. Remove the resources created by Terraform
 
 ```bash
 - another pipeline "Infra - Terraform Destroy" has been created for Infra Destroy purposes

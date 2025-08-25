@@ -41,7 +41,7 @@ jobs:
           -backend-config="key=${{ vars.TF_BACKEND_KEY }}"
           -backend-config="region=${{ vars.AWS_REGION }}"
 
-      - name: Terraform Apply
+      - name: Terraform Destroy
         run: >
           terraform destroy -auto-approve
           -var-file="environments/${{ github.event.inputs.environment }}.tfvars"
