@@ -1,0 +1,92 @@
+name: Infra - Terraform Plan & Apply
+on:
+  workflow_dispatch:
+    inputs:
+      pool:
+      environment:
+        type: environment
+        description: Environment to deploy
+        required: true
+        default: dev
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan - ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    env:
+      TF_VAR_environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: >
+          terraform init
+          -backend-config="bucket=${{ vars.TF_BACKEND_BUCKET }}"
+          -backend-config="key=${{ vars.TF_BACKEND_KEY }}"
+          -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: Terraform Validate
+        run: >
+          terraform validate
+
+      - name: Terraform Plan
+        run: >
+          terraform plan
+          -var-file="environments/${{ github.event.inputs.environment }}.tfvars"
+          -out=environments/tfplan-${{ github.event.inputs.environment }}
+
+      - name: Upload tfplan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ github.event.inputs.environment }}
+          path: |
+            environments/tfplan-${{ github.event.inputs.environment }}
+
+  terraform-apply:
+    name: Terraform Apply - ${{ github.event.inputs.environment }}
+    runs-on: ubuntu
+    needs: terraform-plan
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Download tfplan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ github.event.inputs.environment }}
+          path: environments/${{ github.event.inputs.environment }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Terraform Init
+        run: >
+          terraform init
+          -backend-config="bucket=${{ vars.TF_BACKEND_BUCKET }}"
+          -backend-config="key=${{ vars.TF_BACKEND_KEY }}"
+          -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: Terraform Apply
+        run: >
+          terraform apply -auto-approve
+          environments/${{ github.event.inputs.environment }}/tfplan-${{ github.event.inputs.environment }}
