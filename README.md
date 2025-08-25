@@ -15,11 +15,11 @@ $ terraform apply --auto-approve
 However, the above commands have been automated using a Github Actions Pipeline. Follow the steps below to run the pipeline
 
 ```bash
-- create and environment on github actions called `dev`
+- create and environment on github actions called "dev"
 - on the environment, create secrets for your required credentials, in this case the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 - create variables for your other parameters such as the backend configuration
-- once done, head to actions, the pipeline is created for a workflow_dispatch meaning you have to manually trigger this, it is designed to allow you choose the environment to deploy to, which in turn chooses the appropriate .tfvars containing your environment's values
-- run pipeline.
+- once done, head to "actions", the pipeline is created for a workflow_dispatch meaning you have to manually trigger this, it is designed to allow you choose the environment to deploy to, which in turn chooses the appropriate .tfvars containing your environment's values and run pipeline.
+
 ```
 
 Once the cluster is up and running, you can check that Karpenter is functioning as intended with the following command:
@@ -96,7 +96,7 @@ kubectl delete deployment postgres
 
 ```bash
 - another pipeline "Infra - Terraform Destroy" has been created for Infra Destroy purposes
-- on actions, click on the pipeline, choose the environmet and select "true" for the infra-actions input. This would destroy the cluster
+- on actions, click on the pipeline, choose the environmet and check the "Run infrastructure deployment actions" box and run. This would destroy your created resources.
 ```
 
 Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.

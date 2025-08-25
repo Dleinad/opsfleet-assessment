@@ -111,25 +111,25 @@ resource "helm_release" "karpenter" {
   ]
 }
 
-# resource "kubernetes_manifest" "karpenter_ec2nodeclass" {
-#   depends_on = [helm_release.karpenter]
-#   manifest   = yamldecode(file("karpenter-ec2nodeclass.yaml"))
-# }
+resource "kubernetes_manifest" "karpenter_ec2nodeclass" {
+  depends_on = [helm_release.karpenter]
+  manifest   = yamldecode(file("karpenter-ec2nodeclass.yaml"))
+}
 
-# resource "kubernetes_manifest" "karpenter_nodepool" {
-#   depends_on = [kubernetes_manifest.karpenter_ec2nodeclass]
-#   manifest   = yamldecode(file("karpenter-nodepool.yaml"))
-# }
+resource "kubernetes_manifest" "karpenter_nodepool" {
+  depends_on = [kubernetes_manifest.karpenter_ec2nodeclass]
+  manifest   = yamldecode(file("karpenter-nodepool.yaml"))
+}
 
-# resource "kubernetes_manifest" "inflate" {
-#   depends_on = [kubernetes_manifest.karpenter_nodepool]
-#   manifest   = yamldecode(file("inflate.yaml"))
-# }
+resource "kubernetes_manifest" "inflate" {
+  depends_on = [kubernetes_manifest.karpenter_nodepool]
+  manifest   = yamldecode(file("inflate.yaml"))
+}
 
-# resource "kubernetes_manifest" "postgres" {
-#   depends_on = [kubernetes_manifest.inflate]
-#   manifest   = yamldecode(file("postgres.yaml"))
-# }
+resource "kubernetes_manifest" "postgres" {
+  depends_on = [kubernetes_manifest.inflate]
+  manifest   = yamldecode(file("postgres.yaml"))
+}
 
 ################################################################################
 # Supporting Resources
