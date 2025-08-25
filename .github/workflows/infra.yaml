@@ -2,7 +2,6 @@ name: Infra - Terraform Plan & Apply
 on:
   workflow_dispatch:
     inputs:
-      pool:
       environment:
         type: environment
         description: Environment to deploy
