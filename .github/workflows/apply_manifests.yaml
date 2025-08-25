@@ -1,0 +1,38 @@
+name: Apply Kubernetes Manifests
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: Environment to deploy
+        required: true
+        default: dev
+
+jobs:
+  terraform-plan:
+    name: Apply Kubernetes Manifests - ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    env:
+      TF_VAR_environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name ${{ vars.EKS_CLUSTER_NAME }}
+
+      - name: Apply manifests
+        run: >
+          kubectl apply -f karpenter-ec2nodeclass.yaml
+          kubectl apply -f karpenter-nodepool.yaml
+          kubectl apply -f inflate.yaml
+          kubectl apply -f postgres.yaml

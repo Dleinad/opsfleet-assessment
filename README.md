@@ -47,7 +47,11 @@ kubectl logs -f -n kube-system -l app.kubernetes.io/name=karpenter -c controller
 
 - The above is only required if you prefer to run commands directly on the cluster, however, the current configration runs all these automatically via terraform.
 
-NOTE: since the manifests are dependent on the cluster being up and running on "main.tf" in the root folder line 117-135 is commented out. Once the pipeline runs and cluster is fully healthy you can uncomment and rerun pipeline
+NOTE: since the manifests are dependent on the cluster being up and running on "main.tf" in the root folder line 117-135 is commented out. Once the pipeline runs and cluster is fully healthy you can uncomment and rerun pipeline.
+
+Alternatively, if you prefer not using terraform; there is a github pipeline "apply_manifests.yaml" that will run these commands.
+
+
 
 Validate if the Amazon EKS Addons Pods are running in the Managed Node Group and the `inflate` and `postgres` application Pods are running on Karpenter provisioned Nodes.
 
