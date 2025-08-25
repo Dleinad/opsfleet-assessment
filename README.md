@@ -2,6 +2,8 @@
 
 Configuration in this directory creates an AWS EKS cluster with [Karpenter](https://karpenter.sh/) provisioned for managing compute resource scaling. In the example provided, Karpenter is provisioned on top of an EKS Managed Node Group.
 
+Note: This configuration allows you to deploy the cluster with all the basic functionalities, with karpenter handling autoscaling, node provisioning etcetera. More granular configurations such as network segregation, rbac, etc will require more configurations
+
 ## Usage
 
 To provision the provided configurations you need to execute:
@@ -27,7 +29,11 @@ Once the cluster is up and running, you can check that Karpenter is functioning 
 ```bash
 # First, make sure you have updated your local kubeconfig
 aws eks --region eu-west-1 update-kubeconfig --name ex-karpenter
+```
 
+Also ensure that the role karpenter uses, has the necessary permissions to request spot instances AmazonEC2SpotFleetTaggingRole
+
+```bash
 # Second, deploy the Karpenter NodeClass/NodePool
 kubectl apply -f karpenter.yaml
 
@@ -39,6 +45,8 @@ kubectl apply -f postgres.yaml
 kubectl logs -f -n kube-system -l app.kubernetes.io/name=karpenter -c controller
 ```
 
+The above is only required if you prefer to run commands directly on the cluster, however, the current configration runs all these automatically via terraform
+
 Validate if the Amazon EKS Addons Pods are running in the Managed Node Group and the `inflate` and `postgres` application Pods are running on Karpenter provisioned Nodes.
 
 ```bash
@@ -47,9 +55,9 @@ kubectl get nodes -L karpenter.sh/registered
 
 ```text
 NAME                                        STATUS   ROLES    AGE   VERSION               REGISTERED
-ip-10-0-13-51.eu-west-1.compute.internal    Ready    <none>   29s   v1.31.1-eks-1b3e656   true
-ip-10-0-41-242.eu-west-1.compute.internal   Ready    <none>   35m   v1.31.1-eks-1b3e656
-ip-10-0-8-151.eu-west-1.compute.internal    Ready    <none>   35m   v1.31.1-eks-1b3e656
+ip-10-0-12-155.eu-west-1.compute.internal   Ready    <none>   9m26s   v1.33.1-eks-f5be8fb   true
+ip-10-0-47-204.eu-west-1.compute.internal   Ready    <none>   94m     v1.33.3-eks-3abbec1   
+ip-10-0-5-134.eu-west-1.compute.internal    Ready    <none>   94m     v1.33.3-eks-3abbec1
 ```
 
 ```sh
@@ -58,27 +66,25 @@ kubectl get pods -A -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
 
 ```text
 NAME                           NODE
-inflate-67cd5bb766-hvqfn       ip-10-0-13-51.eu-west-1.compute.internal
-inflate-67cd5bb766-jnsdp       ip-10-0-13-51.eu-west-1.compute.internal
-inflate-67cd5bb766-k4gwf       ip-10-0-41-242.eu-west-1.compute.internal
-inflate-67cd5bb766-m49f6       ip-10-0-13-51.eu-west-1.compute.internal
-inflate-67cd5bb766-pgzx9       ip-10-0-8-151.eu-west-1.compute.internal
-aws-node-58m4v                 ip-10-0-3-57.eu-west-1.compute.internal
-aws-node-pj2gc                 ip-10-0-8-151.eu-west-1.compute.internal
-aws-node-thffj                 ip-10-0-41-242.eu-west-1.compute.internal
-aws-node-vh66d                 ip-10-0-13-51.eu-west-1.compute.internal
-coredns-844dbb9f6f-9g9lg       ip-10-0-41-242.eu-west-1.compute.internal
-coredns-844dbb9f6f-fmzfq       ip-10-0-41-242.eu-west-1.compute.internal
-eks-pod-identity-agent-jr2ns   ip-10-0-8-151.eu-west-1.compute.internal
-eks-pod-identity-agent-mpjkq   ip-10-0-13-51.eu-west-1.compute.internal
-eks-pod-identity-agent-q4tjc   ip-10-0-3-57.eu-west-1.compute.internal
-eks-pod-identity-agent-zzfdj   ip-10-0-41-242.eu-west-1.compute.internal
-karpenter-5b8965dc9b-rx9bx     ip-10-0-8-151.eu-west-1.compute.internal
-karpenter-5b8965dc9b-xrfnx     ip-10-0-41-242.eu-west-1.compute.internal
-kube-proxy-2xf42               ip-10-0-41-242.eu-west-1.compute.internal
-kube-proxy-kbfc8               ip-10-0-8-151.eu-west-1.compute.internal
-kube-proxy-kt8zn               ip-10-0-13-51.eu-west-1.compute.internal
-kube-proxy-sl6bz               ip-10-0-3-57.eu-west-1.compute.internal
+inflate-7b4df768d6-d4w4r       ip-10-0-47-204.eu-west-1.compute.internal
+inflate-7b4df768d6-l4p6f       ip-10-0-12-155.eu-west-1.compute.internal
+inflate-7b4df768d6-sjc49       ip-10-0-5-134.eu-west-1.compute.internal
+postgres-6b579788c4-6vx7m      ip-10-0-47-204.eu-west-1.compute.internal
+postgres-6b579788c4-l6wjf      ip-10-0-47-204.eu-west-1.compute.internal
+postgres-6b579788c4-nm4pr      ip-10-0-5-134.eu-west-1.compute.internal
+aws-node-jhnm7                 ip-10-0-12-155.eu-west-1.compute.internal
+aws-node-jvmmj                 ip-10-0-47-204.eu-west-1.compute.internal
+aws-node-xdwxt                 ip-10-0-5-134.eu-west-1.compute.internal
+coredns-6c6d59c954-4gh8z       ip-10-0-5-134.eu-west-1.compute.internal
+coredns-6c6d59c954-66xjl       ip-10-0-47-204.eu-west-1.compute.internal
+eks-pod-identity-agent-7sb64   ip-10-0-47-204.eu-west-1.compute.internal
+eks-pod-identity-agent-md4zd   ip-10-0-5-134.eu-west-1.compute.internal
+eks-pod-identity-agent-zjslr   ip-10-0-12-155.eu-west-1.compute.internal
+karpenter-6f8db6ddc-474fj      ip-10-0-5-134.eu-west-1.compute.internal
+karpenter-6f8db6ddc-79tjp      ip-10-0-47-204.eu-west-1.compute.internal
+kube-proxy-kmq6z               ip-10-0-5-134.eu-west-1.compute.internal
+kube-proxy-n4blb               ip-10-0-47-204.eu-west-1.compute.internal
+kube-proxy-xchg4               ip-10-0-12-155.eu-west-1.compute.internal
 ```
 
 ### Tear Down & Clean-Up

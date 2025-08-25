@@ -70,6 +70,7 @@ module "karpenter" {
   # Used to attach additional IAM policies to the Karpenter node IAM role
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    AmazonEC2SpotFleetTaggingRole = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
   }
 
   tags = local.tags
